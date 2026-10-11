@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: decision-network-simulator
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist

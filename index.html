@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Decision Network Simulator</title>
+<meta name="description" content="Interactive Decision Network simulator – Unit V: Uncertain Knowledge and Reasoning">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="nav" id="top">
+  <a class="brand" href="#home">🧠 DN Simulator</a>
+  <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+  <nav id="menu" aria-label="Main">
+    <a href="#learn">Learn</a><a href="#simulator">Simulator</a><a href="#network">Network</a>
+    <a href="#eu">Expected Utility</a><a href="#apps">Applications</a><a href="#phone">Multi-Attribute</a>
+    <a href="#voi">Value of Info</a><a href="#quiz">Quiz</a><a href="#theory">Theory</a>
+  </nav>
+</header>
+<main>
+<section id="home" class="hero">
+  <p class="badge">Unit V – Uncertain Knowledge and Reasoning</p>
+  <h1>AI Decision Network Simulator</h1>
+  <p class="lead">A Decision Network combines probability and utility so an AI agent can pick the action with the best expected outcome when the world is uncertain. Change the numbers below and watch the decision change.</p>
+  <div class="cta"><a class="btn primary" href="#simulator">Start Simulation</a><a class="btn" href="#learn">Learn Decision Networks</a></div>
+  <div class="stats">
+    <div class="glass"><b data-count="3">0</b><span>node types</span></div>
+    <div class="glass"><b data-count="2">0</b><span>decisions compared</span></div>
+    <div class="glass"><b data-count="1">0</b><span>rule: maximise EU</span></div>
+  </div>
+</section>
+
+<section id="learn">
+  <h2>What is a Decision Network?</h2>
+  <p>A <b>Decision Network</b> (also called an <i>influence diagram</i>) extends a Bayesian network with decision and utility nodes. It models <b>decision-making under uncertainty</b>: we don't know what will happen, so we weigh each outcome by how likely it is (probability) and how good or bad it is (utility). The rational choice is the one with the highest <b>expected utility</b>.</p>
+  <div class="flow">
+    <div class="glass node chance"><h3>⬭ Chance Node</h3><p>An uncertain event with probabilities, e.g. Weather: Sunny 70%, Rainy 30%.</p></div>
+    <span class="ar">→</span>
+    <div class="glass node decision"><h3>▭ Decision Node</h3><p>The choices the agent controls, e.g. Carry or Don't carry an umbrella.</p></div>
+    <span class="ar">→</span>
+    <div class="glass node utility"><h3>◇ Utility Node</h3><p>The value of an outcome, e.g. +10 for staying dry, −10 for getting soaked.</p></div>
+  </div>
+</section>
+
+<section id="simulator">
+  <h2>Interactive Decision Network Simulator</h2>
+  <p>Problem: <b>“Should I carry an umbrella today?”</b> Edit any name, probability or utility. Results update instantly.</p>
+  <div class="glass sim">
+    <div class="tablewrap"><table>
+      <tr><th scope="row">State name</th><td><input id="s0" aria-label="State 1 name" value="Sunny"></td><td><input id="s1" aria-label="State 2 name" value="Rainy"></td></tr>
+      <tr><th scope="row">Probability (%)</th><td><input id="p0" type="number" min="0" max="100" step="any" aria-label="Probability of state 1" value="70"></td><td><input id="p1" type="number" min="0" max="100" step="any" aria-label="Probability of state 2" value="30"></td></tr>
+      <tr><th scope="row"><input id="d0" aria-label="Decision 1 name" value="Carry Umbrella"></th><td><input id="u00" type="number" step="any" aria-label="Utility of decision 1 in state 1" value="5"></td><td><input id="u01" type="number" step="any" aria-label="Utility of decision 1 in state 2" value="10"></td></tr>
+      <tr><th scope="row"><input id="d1" aria-label="Decision 2 name" value="Do Not Carry Umbrella"></th><td><input id="u10" type="number" step="any" aria-label="Utility of decision 2 in state 1" value="8"></td><td><input id="u11" type="number" step="any" aria-label="Utility of decision 2 in state 2" value="-10"></td></tr>
+    </table></div>
+    <p id="warn" class="warn" role="alert" hidden></p>
+    <div class="cta"><button class="btn" id="norm">Normalize to 100%</button><button class="btn" id="reset">Reset example</button></div>
+    <div class="results">
+      <div class="glass res" id="r0"></div><div class="glass res" id="r1"></div>
+    </div>
+    <div class="glass best" aria-live="polite"><span>🏆 Recommended Decision</span><strong id="best"></strong></div>
+  </div>
+</section>
+
+<section id="network">
+  <h2>Visual Decision Network</h2>
+  <p>This diagram reads your simulator values live.</p>
+  <div class="net">
+    <div class="glass nd chance" id="nW">Weather</div><i class="line"></i>
+    <div class="glass nd chance" id="nS"></div><i class="line"></i>
+    <div class="glass nd decision">Decision</div>
+    <div class="split"><i class="line"></i><i class="line"></i></div>
+    <div class="row2"><div class="glass nd decision" id="nO0"></div><div class="glass nd decision" id="nO1"></div></div>
+    <div class="split"><i class="line"></i><i class="line"></i></div>
+    <div class="glass nd utility">Utility</div><i class="line"></i>
+    <div class="glass nd utility" id="nE"></div><i class="line"></i>
+    <div class="glass nd best-n" id="nB"></div>
+  </div>
+</section>
+
+<section id="eu">
+  <h2>Expected Utility</h2>
+  <p>Expected utility is the average payoff of a decision if you could repeat the situation many times, weighting each outcome by its probability.</p>
+  <div class="glass formula">EU(D) = Σ P(S) × U(D,S)</div>
+  <ul class="plain">
+    <li><b>P(S)</b> – probability that state S happens.</li>
+    <li><b>U(D,S)</b> – utility of taking decision D when state S happens.</li>
+    <li><b>EU(D)</b> – expected utility of decision D (sum over all states).</li>
+  </ul>
+  <h3>Step-by-step (live from the simulator)</h3>
+  <div class="glass steps" id="steps"></div>
+</section>
+
+<section id="apps">
+  <h2>Real-World Applications</h2>
+  <div class="grid">
+    <div class="glass card"><h3>🏥 Healthcare</h3><p>Choose a treatment given uncertain diagnoses and patient outcomes.</p></div>
+    <div class="glass card"><h3>📈 Investment</h3><p>Weigh returns against market uncertainty and risk.</p></div>
+    <div class="glass card"><h3>🏢 Business Strategy</h3><p>Decide on launches or pricing under uncertain demand.</p></div>
+    <div class="glass card"><h3>🛡️ Insurance</h3><p>Price policies using the probability and cost of claims.</p></div>
+    <div class="glass card"><h3>✈️ Travel Planning</h3><p>Pick routes and bookings with delay and weather risk.</p></div>
+    <div class="glass card"><h3>📱 Product Selection</h3><p>Compare options on several attributes at once.</p></div>
+    <div class="glass card"><h3>🎓 Career Decisions</h3><p>Compare paths with uncertain growth, pay and satisfaction.</p></div>
+  </div>
+</section>
+
+<section id="phone">
+  <h2>Multi-Attribute Decision: Choose a Smartphone</h2>
+  <p>Each phone is scored 0–10 on every attribute (higher is better; a high Price score means cheaper). Set the weights for what matters to you. Overall utility = Σ weight × score, with weights normalised to sum to 1.</p>
+  <div class="glass sim">
+    <div class="sliders" id="sliders"></div>
+    <div class="tablewrap"><table id="ptable"></table></div>
+    <div class="glass best" aria-live="polite"><span>📱 Best phone for your weights</span><strong id="pbest"></strong></div>
+  </div>
+</section>
+
+<section id="voi">
+  <h2>Value of Information</h2>
+  <p><b>Value of Information (VOI)</b> is how much better your expected result gets if you learn something before deciding. Example: a perfect weather forecast tells you Sunny or Rainy first, so you can choose the best action for each case.</p>
+  <div class="glass steps" id="voiBox"></div>
+  <p>The difference is the <b>Expected Value of Perfect Information (EVPI)</b>. If a forecast costs more than EVPI, it isn't worth buying.</p>
+</section>
+
+<section id="quiz">
+  <h2>Quiz</h2>
+  <div class="glass sim" id="quizBox"></div>
+</section>
+
+<section id="theory">
+  <h2>Theory Notes</h2>
+  <div class="grid">
+    <details class="glass card" open><summary>Decision Networks</summary><p>A graph with chance, decision and utility nodes. Edges show influence or information available before a decision.</p></details>
+    <details class="glass card"><summary>Utility Functions</summary><p>A utility function maps each outcome to a number showing how much the agent prefers it. Higher is better.</p></details>
+    <details class="glass card"><summary>Multi-attribute Utility</summary><p>When outcomes have several attributes, combine them, often as a weighted sum U = Σ wᵢ·uᵢ.</p></details>
+    <details class="glass card"><summary>Expected Utility</summary><p>EU(a) = Σ P(s)·U(a,s). A rational agent picks the action that maximises EU (MEU principle).</p></details>
+    <details class="glass card"><summary>Value of Information</summary><p>VOI = expected utility with the information − expected utility without it. It is never negative.</p></details>
+    <details class="glass card"><summary>Decision-making under Uncertainty</summary><p>The agent doesn't know the true state, so it uses probabilities for beliefs and utilities for preferences.</p></details>
+  </div>
+  <div class="glass outcome"><h3>Project Learning Outcome</h3><p>This project demonstrates how AI can make rational decisions under uncertainty using probability, utility and expected utility, by letting you build, change and test a working Decision Network.</p></div>
+</section>
+</main>
+<footer><b>AI Decision Network Simulator</b><span>Unit V – Uncertain Knowledge and Reasoning</span><span>Educational Project</span></footer>
+<script src="js/script.js"></script>
+</body>
+</html>
